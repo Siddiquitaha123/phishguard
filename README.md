@@ -1,6 +1,6 @@
 # PhishGuard
 
-PhishGuard is an explainable phishing-triage application that analyzes suspicious email text and URLs. It helps a security analyst identify common phishing indicators, understand why a message was flagged, and decide what to investigate next.
+I built PhishGuard as an explainable phishing-triage application for analyzing suspicious email text and URLs. It helps a security analyst identify common phishing indicators, understand why a message was flagged, and decide what to investigate next.
 
 ![PhishGuard analysis result](docs/screenshots/phishguard-analysis.webp)
 
