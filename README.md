@@ -148,14 +148,12 @@ The automated test suite covers:
 
 Full verification details are available in [docs/TEST_RESULTS.md](docs/TEST_RESULTS.md).
 
-## Future improvements
+## Next steps
 
-- Email header analysis for SPF, DKIM, and DMARC results
-- SQLite-based case tracking
-- Analyst feedback and decision history
-- Threat-intelligence enrichment through an isolated worker
-- Precision, recall, and false-positive evaluation on a privacy-safe dataset
-- SIEM event export for security monitoring
+- Add email-header analysis for SPF, DKIM, and DMARC results.
+- Add SQLite case tracking with analyst decisions and feedback.
+- Evaluate detection quality with precision, recall, and false-positive metrics on a privacy-safe dataset.
+- Add isolated threat-intelligence enrichment and SIEM event export.
 
 ## License
 
