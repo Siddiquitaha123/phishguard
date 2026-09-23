@@ -17,7 +17,11 @@ I built PhishGuard as an explainable phishing-triage application for analyzing s
 
 ## Tech stack
 
-Python, Flask, REST API, HTML5, CSS3, vanilla JavaScript, pytest, Gunicorn, Docker, Git, GitHub Actions, regular expressions, URL parsing, input validation, threat modeling, and web-security principles.
+- **Core:** Python 3.12, regular expressions, URL parsing, input validation, networking, and web-security principles.
+- **Application:** Flask REST API, HTML5, CSS3, and vanilla JavaScript.
+- **Testing and quality:** pytest and GitHub Actions.
+- **Deployment:** Gunicorn and Docker.
+- **Version control:** Git and GitHub.
 
 ## How it works
 
