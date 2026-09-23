@@ -1,0 +1,8 @@
+# High-risk example
+URGENT: Your payroll account is suspended. Verify your password immediately at http://192.0.2.10/login?password=reset
+
+# Review example
+Your package delivery needs an update. Visit http://bit.ly/abc123 to confirm your address.
+
+# Low-risk example
+The security awareness session is scheduled for Tuesday at 10:00 in Room 4.

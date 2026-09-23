@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PhishGuard | Explainable phishing triage</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">DEFENSIVE SECURITY TOOLKIT</p>
+      <h1>PhishGuard</h1>
+      <p class="lede">An offline-first phishing triage assistant that explains its evidence. Paste suspicious email text or a URL; do not paste real secrets.</p>
+    </header>
+    <section class="panel">
+      <label for="message">Message or URL</label>
+      <textarea id="message" maxlength="50000" placeholder="Example: Your account is suspended. Verify immediately at http://192.0.2.10/login?password=1"></textarea>
+      <div class="actions">
+        <button id="analyze" type="button">Analyze safely</button>
+        <button id="example" class="secondary" type="button">Load example</button>
+      </div>
+      <p id="status" class="status" role="status"></p>
+    </section>
+    <section id="results" class="results" hidden>
+      <div class="score-card"><span>Risk score</span><strong id="score">0</strong><span id="verdict"></span></div>
+      <div><h2>What was found</h2><div id="findings"></div></div>
+      <div><h2>Recommended next steps</h2><ul id="recommendations"></ul></div>
+      <details><summary>Extracted URLs</summary><ul id="urls"></ul></details>
+    </section>
+    <footer><span>Educational defensive tool. It does not visit URLs, detonate files, or replace a trained analyst.</span></footer>
+  </main>
+<script>
+const $ = (id) => document.getElementById(id);
+$('example').onclick = () => { $('message').value = 'URGENT: Your Microsoft 365 password expires today. Verify immediately at http://192.0.2.10/login?password=reset'; };
+$('analyze').onclick = async () => {
+  const text = $('message').value;
+  $('status').textContent = 'Analyzing locally…';
+  try {
+    const response = await fetch('/api/analyze', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text}) });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Analysis failed');
+    $('results').hidden = false;
+    $('score').textContent = data.score + '/100';
+    $('verdict').textContent = data.verdict + ' · ' + data.confidence + ' confidence';
+    $('findings').innerHTML = data.findings.map(f => `<article class="finding ${f.severity}"><div><b>${escapeHtml(f.title)}</b><span class="pill">${escapeHtml(f.severity)} +${f.points}</span></div><p>${escapeHtml(f.detail)}</p></article>`).join('');
+    $('recommendations').innerHTML = data.recommendations.map(r => `<li>${escapeHtml(r)}</li>`).join('');
+    $('urls').innerHTML = data.urls.length ? data.urls.map(u => `<li><code>${escapeHtml(u)}</code></li>`).join('') : '<li>No URLs extracted.</li>';
+    $('status').textContent = 'Analysis complete. Review the evidence before making a decision.';
+  } catch (error) { $('status').textContent = error.message; }
+};
+function escapeHtml(value) { return value.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+</script>
+</body>
+</html>
