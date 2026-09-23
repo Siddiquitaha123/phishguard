@@ -100,6 +100,7 @@ The analyzer is kept separate from Flask so it can be tested independently or re
 | `tests/test_phishguard.py` | Unit, API, validation, and header tests. |
 | `samples/demo_messages.txt` | Safe test inputs using reserved IP space. |
 | `THREAT_MODEL.md` | Assets, trust boundaries, threats, and mitigations. |
+| `LEARNING_GUIDE.md` | Beginner-friendly study plan and interview demonstration guide. |
 | `.github/workflows/test.yml` | Continuous integration. |
 
 ## Security decisions
