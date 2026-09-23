@@ -17,7 +17,11 @@
 
 ## Technology stack
 
-Python 3.12, Flask, Gunicorn, HTML5, CSS3, vanilla JavaScript, pytest, Docker, Git, and GitHub Actions. The analyzer uses Python standard-library modules including `re`, `ipaddress`, `dataclasses`, and `urllib.parse`.
+**Core skills demonstrated:** Python 3.12, basic HTML/CSS, pytest, Git/GitHub, networking concepts, and defensive web-security principles. The analyzer uses Python standard-library modules including `re`, `ipaddress`, `dataclasses`, and `urllib.parse`.
+
+**Supporting components:** Flask is used as a small Python web/API wrapper, vanilla JavaScript is used only for button actions and displaying the API response, and Gunicorn/Docker are optional deployment configurations. These supporting files are intentionally minimal and are included so the project can be run consistently; they do not represent advanced Flask, JavaScript, Gunicorn, or Docker expertise.
+
+If you are presenting this project as a fresher, describe your strongest contribution as the Python analysis engine, secure input handling, and cybersecurity reasoning. Be transparent that Flask, JavaScript, and Docker are technologies you are learning through this project.
 
 ## Run locally
 
