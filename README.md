@@ -1,32 +1,48 @@
 # PhishGuard
 
-**PhishGuard** is an offline-first phishing-triage web application for analyzing suspicious email text and URLs. It produces an explainable risk score, evidence-based findings, and safe next steps for a human analyst.
+PhishGuard is an explainable phishing-triage application that analyzes suspicious email text and URLs. It helps a security analyst identify common phishing indicators, understand why a message was flagged, and decide what to investigate next.
 
 ![PhishGuard analysis result](docs/screenshots/phishguard-analysis.webp)
 
-> **Safety boundary:** PhishGuard treats URLs as data. It does not visit links, resolve DNS, download files, execute attachments, or send submitted content to external services. It is a triage aid, not a replacement for an analyst.
+## Key features
 
-## Features
-
-- Explainable additive risk score from 0 to 100.
-- URL checks for HTTP, IP-address hosts, URL shorteners, suspicious TLDs, excessive subdomains, brand/login wording, and sensitive query parameters.
-- Message checks for urgency, credential/payment requests, multiple addresses, and risky attachment references.
+- Explainable phishing risk score from 0 to 100.
+- URL analysis for IP-based hosts, HTTP links, URL shorteners, suspicious TLDs, excessive subdomains, brand impersonation, and sensitive query parameters.
+- Message analysis for urgency language, credential requests, payment requests, multiple addresses, and risky attachment references.
+- Structured findings with severity, evidence, and score contribution.
+- Safe recommendations for analyst follow-up.
 - JSON API at `POST /api/analyze`.
-- Input validation, request-size limits, output escaping, Content Security Policy, and browser security headers.
-- Automated unit/API tests, Docker packaging, GitHub Actions CI, threat model, and test evidence.
+- No URL visits, DNS lookups, file downloads, or attachment execution.
+- Input validation, request-size limits, output escaping, CSP, and HTTP security headers.
 
-## Technology stack
+## Tech stack
 
-**Core skills demonstrated:** Python 3.12, basic HTML/CSS, pytest, Git/GitHub, networking concepts, and defensive web-security principles. The analyzer uses Python standard-library modules including `re`, `ipaddress`, `dataclasses`, and `urllib.parse`.
+Python, Flask, REST API, HTML5, CSS3, vanilla JavaScript, pytest, Gunicorn, Docker, Git, GitHub Actions, regular expressions, URL parsing, input validation, threat modeling, and web-security principles.
 
-**Supporting components:** Flask is used as a small Python web/API wrapper, vanilla JavaScript is used only for button actions and displaying the API response, and Gunicorn/Docker are optional deployment configurations. These supporting files are intentionally minimal and are included so the project can be run consistently; they do not represent advanced Flask, JavaScript, Gunicorn, or Docker expertise.
+## How it works
 
-If you are presenting this project as a fresher, describe your strongest contribution as the Python analysis engine, secure input handling, and cybersecurity reasoning. Be transparent that Flask, JavaScript, and Docker are technologies you are learning through this project.
+```text
+Suspicious email or URL
+          |
+          v
+Flask API validates the request
+          |
+          v
+Python analyzer extracts URLs and checks phishing indicators
+          |
+          v
+Risk score + findings + recommendations
+          |
+          v
+Results displayed in the browser
+```
+
+The analyzer uses a transparent additive heuristic model. The score is used for triage and prioritization; it is not a probability and does not replace analyst review.
 
 ## Run locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/phishguard.git
+git clone https://github.com/Siddiquitaha123/phishguard.git
 cd phishguard
 python3 -m venv .venv
 source .venv/bin/activate
@@ -35,15 +51,15 @@ pytest -q
 python -m flask --app app.main run
 ```
 
-Open <http://127.0.0.1:5000> and click **Load example**, then **Analyze safely**.
+Open <http://127.0.0.1:5000>, click **Load example**, and then click **Analyze safely**.
 
-Expected test result:
+Expected test output:
 
 ```text
 7 passed
 ```
 
-On Windows PowerShell, use:
+### Windows PowerShell
 
 ```powershell
 py -m venv .venv
@@ -62,7 +78,7 @@ docker run --rm -p 5000:5000 phishguard
 
 Open <http://127.0.0.1:5000>.
 
-## API example
+## API usage
 
 ```bash
 curl -s http://127.0.0.1:5000/api/analyze \
@@ -70,43 +86,73 @@ curl -s http://127.0.0.1:5000/api/analyze \
   -d '{"text":"URGENT: verify your password at http://192.0.2.10/login?password=x"}'
 ```
 
-The response contains `score`, `verdict`, `confidence`, `urls`, `findings`, and `recommendations`.
+The response includes:
+
+```text
+score
+verdict
+confidence
+urls
+findings
+recommendations
+```
+
+## Example result
+
+A message such as:
+
+```text
+URGENT: Your Microsoft 365 password expires today.
+Verify immediately at http://192.0.2.10/login?password=reset
+```
+
+is identified as high risk because it combines an IP-based HTTP URL, urgency language, login wording, and a password request. The IP address is from the documentation-only range reserved for examples.
 
 ## Project structure
 
 ```text
-app/analyzer.py                 Explainable phishing-analysis engine
-app/main.py                    Flask routes, validation, and security headers
+app/analyzer.py                 Phishing-analysis engine
+app/main.py                    Flask routes and security headers
 app/templates/index.html       Web interface
-app/static/app.js              Browser interaction and API call
-app/static/style.css            Interface styling
+app/static/app.js              Browser interactions
+app/static/style.css            User interface styling
 tests/test_phishguard.py        Unit and API tests
-samples/demo_messages.txt      Safe demonstration inputs
-THREAT_MODEL.md                Threats, trust boundaries, and mitigations
-docs/TEST_RESULTS.md            Verification evidence
-docs/screenshots/               Running-app screenshot
-Dockerfile                      Container image definition
-.github/workflows/test.yml     CI test workflow
+samples/demo_messages.txt      Safe test messages
+THREAT_MODEL.md                Security design and mitigations
+docs/TEST_RESULTS.md            Verification results
+docs/screenshots/               Application screenshot
+Dockerfile                      Container configuration
+.github/workflows/test.yml     Continuous integration
 ```
-
-## Risk labels
-
-| Score | Label | Meaning |
-|---:|---|---|
-| 0–29 | Low risk | Few known signals; continue normal verification. |
-| 30–59 | Needs review | Investigate and verify through a separate channel. |
-| 60–100 | High risk | Do not click, open, or disclose information. |
-
-The score is a prioritization heuristic, not a probability or proof of compromise.
 
 ## Security design
 
-The application does not persist submitted messages. It validates JSON type and input length before analysis. It uses safe URL parsing instead of network requests. Findings are escaped before being inserted into the browser DOM. The server adds CSP, clickjacking protection, MIME-sniffing protection, referrer control, and a restrictive permissions policy.
+PhishGuard treats submitted URLs as untrusted data and never visits them. This reduces the risk of server-side request forgery, malware execution, and accidental data exposure. The application validates input before analysis, escapes displayed findings, avoids storing submitted messages, and adds browser security headers including Content Security Policy, clickjacking protection, MIME-sniffing protection, and a restrictive permissions policy.
 
-## Resume description
+## Testing
 
-> Built PhishGuard, an explainable offline-first phishing-triage application in Python and Flask. Implemented URL and social-engineering heuristics, secure input validation, CSP and HTTP security headers, structured JSON findings, automated tests, Docker packaging, threat modeling, and GitHub Actions CI.
+The automated test suite covers:
+
+- URL extraction and normalization
+- High-risk phishing detection
+- Low-risk messages
+- Invalid content types
+- Empty input
+- Oversized input
+- JSON API responses
+- Security headers
+
+Full verification details are available in [docs/TEST_RESULTS.md](docs/TEST_RESULTS.md).
+
+## Future improvements
+
+- Email header analysis for SPF, DKIM, and DMARC results
+- SQLite-based case tracking
+- Analyst feedback and decision history
+- Threat-intelligence enrichment through an isolated worker
+- Precision, recall, and false-positive evaluation on a privacy-safe dataset
+- SIEM event export for security monitoring
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT License. See [LICENSE](LICENSE).
